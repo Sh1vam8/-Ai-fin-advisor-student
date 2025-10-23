@@ -143,8 +143,3 @@ streamlit run streamlit_app.py
 ⚠️ **Educational purposes only** – This app does **not provide financial advice**. Users are responsible for their financial decisions.
 
 ---
-
-If you want, I can also **create a polished `architecture.md`** for the `/docs` folder showing **app flow, module structure, and data flow**, which will make your repo look highly professional for portfolio or MiM/MBA applications.
-
-Do you want me to do that next?
-
