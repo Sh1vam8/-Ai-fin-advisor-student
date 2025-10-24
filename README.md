@@ -143,3 +143,5 @@ streamlit run streamlit_app.py
 ⚠️ **Educational purposes only** – This app does **not provide financial advice**. Users are responsible for their financial decisions.
 
 ---
+
+
