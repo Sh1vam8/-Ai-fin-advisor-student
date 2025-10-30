@@ -126,7 +126,7 @@ Project summary and academic information for mini-project submission.
 > *(After running the app, take a screenshot and save it as `screenshot_app.png` in your project folder.)*
 > Example preview:
 
-![AI Financial Advisor Screenshot](screenshot_app.png)
+![AI Financial Advisor Screenshot](c:\Users\Shivam\Pictures\Screenshots\Screenshot 2025-10-30 102428.png)
 
 ---
 
