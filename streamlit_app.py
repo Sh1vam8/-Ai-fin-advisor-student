@@ -1,9 +1,19 @@
-from ast import Load
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import os
+
+st.image("assets/logo.png", width=150)
+
+# --- Import modules ---
+from modules.profile import get_student_profile
+from modules.budget import budget_advice
+from modules.savings_engine import savings_plan
+from modules.forecast import forecast_balance
+from modules.insights import generate_insights
+from modules.ai_optimizer import predict_optimal_budget
+from modules.tips_system import get_random_tip
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="AI Financial Advisor", page_icon="💰", layout="wide")
@@ -17,6 +27,8 @@ page = st.sidebar.radio(
         "📊 Financial Planner",
         "📈 Financial Dashboard",
         "🧠 AI Investment Tips",
+        "🤖 AI Insights",
+        "🧮 Smart AI Tools",
         "ℹ️ About Project",
     ],
 )
@@ -58,7 +70,22 @@ elif page == "📊 Financial Planner":
     total_expenses = rent + food + transport + loan + misc
     st.info(f"💸 **Your total expenses:** ₹{total_expenses:,.0f}")
 
-    # --- Initialize session_state DataFrame ---
+    # --- Integrate modules logic ---
+    student = get_student_profile(name, income, total_expenses, target_savings)
+    advice = budget_advice(student["balance"])
+    savings_msg = savings_plan(income, total_expenses, target_savings)
+    forecast = forecast_balance(student["balance"])
+
+    st.write("### 🧠 Personalized Insights")
+    st.write(f"**Balance:** ₹{student['balance']:,.0f}")
+    st.success(advice)
+    st.info(savings_msg)
+
+    st.write("### 📈 Balance Growth Forecast (6 Months)")
+    forecast_df = pd.DataFrame(forecast, columns=["Month", "Projected Balance"])
+    st.table(forecast_df)
+
+    # --- Session persistence ---
     if 'planner_data' not in st.session_state:
         st.session_state.planner_data = pd.DataFrame(columns=[
             'Month', 'Income', 'Expenses', 'Savings', 'Rent', 'Food', 'Transport','Loan','Misc'
@@ -81,8 +108,6 @@ elif page == "📊 Financial Planner":
         })
         st.session_state.planner_data = pd.concat([st.session_state.planner_data, new_entry], ignore_index=True)
         st.success(f"Data saved! Your savings for this month: ₹{savings}")
-
-        # Optional: save to CSV for persistence
         st.session_state.planner_data.to_csv("planner_data.csv", index=False)
 
     # --- Show current planner data ---
@@ -92,15 +117,6 @@ elif page == "📊 Financial Planner":
             {"Income":"₹{:.0f}", "Expenses":"₹{:.0f}", "Savings":"₹{:.0f}", 
              "Rent":"₹{:.0f}", "Food":"₹{:.0f}", "Transport":"₹{:.0f}","Loan":"₹{:.0f}" ,"Misc":"₹{:.0f}"}
         ))
-
-        # --- 6-month projection ---
-        st.subheader("📈 6-Month Savings Projection")
-        last_savings = st.session_state.planner_data['Savings'].iloc[-1]
-        projection = pd.DataFrame({
-            "Month":[f"Month {i+1}" for i in range(6)],
-            "Projected Savings":[last_savings*i for i in range(1,7)]
-        })
-        st.table(projection.style.format({"Projected Savings":"₹{:.0f}"}))
 
 # --- FINANCIAL DASHBOARD ---
 elif page == "📈 Financial Dashboard":
@@ -146,12 +162,50 @@ elif page == "🧠 AI Investment Tips":
         else:
             st.write(f"💡 For '{goal}', explore crypto or small-cap mutual funds — high risk, high reward!")
 
+# --- AI INSIGHTS ---
+elif page == "🤖 AI Insights":
+    st.header("🤖 Smart Financial Insights")
+
+    import modules.insights as insights
+    import modules.savings_engine as se
+    import modules.forecast as fc
+
+    if 'planner_data' in st.session_state and not st.session_state.planner_data.empty:
+        df = st.session_state.planner_data.copy()
+
+        st.subheader("📊 Personalized Insights")
+        for msg in insights.generate_insights(df):
+            st.write("-", msg)
+
+        st.subheader("💰 Savings Goal Advisor")
+        last_row = df.iloc[-1]
+        st.write(se.savings_plan(last_row['Income'], last_row['Expenses'], 5000))
+
+        st.subheader("🔮 Projected Balance (Next 6 Months)")
+        forecast = fc.forecast_balance(df['Savings'].sum(), months=6)
+        st.write(forecast)
+    else:
+        st.warning("No financial data available. Please add your monthly records first.")
+        # --- AI INSIGHTS ---
+
+# --- SMART AI TOOLS ---
+elif page == "🧮 Smart AI Tools":
+    st.header("🧮 Smart AI-Powered Financial Tools")
+
+    if st.button("Run Budget Optimization"):
+        result = predict_optimal_budget()
+        st.success(f"Predicted savings with +₹1000 income: ₹{result['predicted_savings']}")
+
+    st.divider()
+    st.subheader("💡 Smart Finance Tip")
+    st.info(get_random_tip())
+
 # --- ABOUT PAGE ---
 elif page == "ℹ️ About Project":
     st.header("ℹ️ About This Mini Project")
     st.markdown("""
     **Project Name:** AI Financial Advisor for Students  
-    **Technology Used:** Python, Streamlit, Pandas, Plotly, Scikit-learn  
+    **Technology Used:** Python, Streamlit, Pandas, Plotly  
     **Goal:** Build financial awareness and micro-investment strategies for students.
 
     Developed as part of *Mini Project – EDGE* to showcase AI-driven decision-making for personal finance.
